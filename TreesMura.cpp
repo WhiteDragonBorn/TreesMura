@@ -78,10 +78,68 @@ bool isBalanced(TTree root) {
          (abs(getHeight(root->left) - getHeight(root->right)) <= 1);
 }
 
+// counts amount of nodes on the fixed level of the tree
+int countElemOnLevel(TTree root, int level, int current_level) {
+  if (!root)
+    return 0;
+  else {
+    if (level == current_level) return 1;
+    return countElemOnLevel(root->right, level, current_level + 1) +
+           countElemOnLevel(root->left, level, current_level + 1);
+  }
+}
+
+// -------------------------------- HOMEWORK -------------------------------- \\
+
+// HW-1.1
+// find absolute maximum of a tree
+data_t findAbsMax(TTree root) {
+  if (!root) return 0;
+  return max(max(findAbsMax(root->right), findAbsMax(root->left)),
+             abs(root->data));
+}
+
+void findAbsMax(TTree root, data_t& value) {
+  if (!root) return;
+  if (abs(root->data) > value) value = abs(root->data);
+  findAbsMax(root->right, value);
+  findAbsMax(root->left, value);
+}
+
+// HW-1.2
+// find the value of rightmost leaf
+bool isLeaf(TTree root) { return !root->left && !root->right; }
+
+data_t rightLeaf(TTree root) {
+  if (isLeaf(root)) return root->data;
+  if (root->right)
+    rightLeaf(root->right);
+  else
+    rightLeaf(root->left);
+}
+
+// HW-1.3
+// create a special binary tree
+void create(TTree& root, int n, int current) {
+  if (current <= n) {
+    root = new Node;
+    root->data = current;
+    root->right = nullptr;
+    root->left = nullptr;
+    current++;
+    create(root->right, n, current);
+    create(root->left, n, current);
+  }
+  return;
+}
+
+// ----------------------------- HOMEWORK END ----------------------------- \\
+
 int main() {
   TTree root = nullptr;
+  TTree test = nullptr;
 
-  int count, input, nodes = 0;
+  int count, input, nodes = 0, abs_max = INT_MIN;
   cin >> count;
   for (size_t i = 0; i < count; i++) {
     cin >> input;
@@ -98,4 +156,14 @@ int main() {
   cout << endl << getHeight(root);
 
   cout << endl << isBalanced(root);
+
+  findAbsMax(root, abs_max);
+  cout << endl << findAbsMax(root) << " --- " << abs_max;
+
+  cout << endl << rightLeaf(root);
+
+  cout << endl;
+  int current = 1, n = 4;
+  create(test, n, current);
+  view(test);
 }
